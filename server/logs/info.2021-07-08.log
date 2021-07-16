@@ -1,0 +1,2 @@
+[2021-07-08T17:31:15.126] [INFO] http - ::1 - - "POST /user/login HTTP/1.1" 200 123 "" "PostmanRuntime/7.28.1"
+[2021-07-08T17:33:17.943] [INFO] http - ::1 - - "POST /deploy/deleteBundle HTTP/1.1" 200 61 "" "PostmanRuntime/7.28.1"

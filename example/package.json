@@ -1,0 +1,25 @@
+{
+  "name": "react-native-code-fly-example",
+  "description": "Example app for react-native-code-fly",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android-run-release": "react-native run-android --variant=release",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "bunldle-android": "react-native bundle --assets-dest ./out/android/bundle --bundle-output ./out/android/bundle/index.android.bundle --dev false --entry-file index.tsx --platform android",
+    "bundle-ios": "react-native bundle --entry-file index.tsx --platform ios  --dev false --bundle-output ./out/ios/bundle/index.jsbundle --assets-dest ./out/ios/bundle"
+  },
+  "dependencies": {
+    "react": "16.13.1",
+    "react-native": "0.63.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/runtime": "^7.12.5",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "metro-react-native-babel-preset": "^0.64.0"
+  }
+  
+}
