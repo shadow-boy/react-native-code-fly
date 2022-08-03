@@ -37,7 +37,6 @@ import java.util.Map;
 
 public class CodeFlyNativeModule extends ReactContextBaseJavaModule {
     private String mBinaryContentsHash = null;
-    private String mClientUniqueId = null;
     private LifecycleEventListener mLifecycleEventListener = null;
     private int mMinimumBackgroundDuration = 0;
 
@@ -58,7 +57,6 @@ public class CodeFlyNativeModule extends ReactContextBaseJavaModule {
 
         // Initialize module state while we have a reference to the current context.
         mBinaryContentsHash = CodeFlyUpdateUtils.getHashForBinaryContents(reactContext, mCodeFly.isDebugMode());
-        mClientUniqueId = Settings.Secure.getString(reactContext.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     @Override
@@ -349,7 +347,7 @@ public class CodeFlyNativeModule extends ReactContextBaseJavaModule {
         try {
             WritableMap configMap =  Arguments.createMap();
             configMap.putString("appVersion", mCodeFly.getAppVersion());
-            configMap.putString("clientUniqueId", mClientUniqueId);
+            configMap.putString("clientUniqueId", "this is fake id for avoid to submit android software market in china");
             configMap.putString("deploymentKey", mCodeFly.getDeploymentKey());
             configMap.putString("serverUrl", mCodeFly.getServerUrl());
 
