@@ -347,7 +347,7 @@ public class CodeFlyNativeModule extends ReactContextBaseJavaModule {
         try {
             WritableMap configMap =  Arguments.createMap();
             configMap.putString("appVersion", mCodeFly.getAppVersion());
-            configMap.putString("clientUniqueId", "this_is_a_fake_android_id_to_avoid_");
+            configMap.putString("clientUniqueId", "this_is_a_fake_android_id_to_avoid__");
             configMap.putString("deploymentKey", mCodeFly.getDeploymentKey());
             configMap.putString("serverUrl", mCodeFly.getServerUrl());
 
