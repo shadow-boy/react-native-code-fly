@@ -23,8 +23,8 @@
 
 @implementation CodeFly {
     BOOL _hasResumeListener;
-//    BOOL _isFirstRunAfterUpdate;
-//    int _minimumBackgroundDuration;
+    //    BOOL _isFirstRunAfterUpdate;
+    //    int _minimumBackgroundDuration;
     // Used to coordinate the dispatching of download progress events to JS.
     long long _latestExpectedContentLength;
     long long _latestReceivedConentLength;
@@ -32,7 +32,7 @@
     
     BOOL _allowed;
     BOOL _restartInProgress;
-
+    
 }
 
 RCT_EXPORT_MODULE()
@@ -65,7 +65,7 @@ static NSString *bundleResourceSubdirectory = nil;
 
 // modify at 2023/10/17
 static NSString *defaultResourceName = @"index";
-static NSString *defaultBundleZipName = @"main.zip";
+static NSString *defaultBundleZipName = @"main";
 static NSString *defaultBundleZipPassword = @"passwordforzip";
 
 
@@ -82,68 +82,69 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
 
 
 +(NSString* )localAssetPath{
-  NSString *supportPath = [self getApplicationSupportDirectory];
-  supportPath = [supportPath stringByAppendingPathComponent:@"codefly_local_assets"];
-  return supportPath;
+    NSString *supportPath = [self getApplicationSupportDirectory];
+    supportPath = [supportPath stringByAppendingPathComponent:@"codefly_local_assets"];
+    return supportPath;
 }
 
 + (NSURL *)localBundleURLForResource:(NSString *)resourceName
-                  bunleFileName:(NSString * )bunleFileName
+                       bunleFileName:(NSString * )bunleFileName
                          zipPassword:(NSString * )zipPassword{
-  if (bunleFileName){
-    defaultBundleZipName = bunleFileName;
-  }
-  if (resourceName){
-    defaultResourceName = resourceName;
-  }
-  if (zipPassword){
-    defaultBundleZipPassword =  zipPassword;
-  }
-  NSFileManager * fm = [NSFileManager defaultManager];
-  NSError * error = nil;
-  if (![fm fileExistsAtPath:[self localAssetPath]]){
-    [[NSFileManager defaultManager] createDirectoryAtPath:[self localAssetPath]
-                              withIntermediateDirectories:YES
-                                               attributes:nil
-                                                    error:&error];
-    if (error){
-      NSLog(@"createDirectoryAtPath.error-->%@",error);
+    if (bunleFileName){
+        defaultBundleZipName = bunleFileName;
     }
-    else{
-      NSLog(@"createDirectoryAtPath.success-->successfully");
+    if (resourceName){
+        defaultResourceName = resourceName;
+    }
+    if (zipPassword){
+        defaultBundleZipPassword =  zipPassword;
+    }
+    NSFileManager * fm = [NSFileManager defaultManager];
+    NSError * error = nil;
+    if (![fm fileExistsAtPath:[self localAssetPath]]){
+        [[NSFileManager defaultManager] createDirectoryAtPath:[self localAssetPath]
+                                  withIntermediateDirectories:YES
+                                                   attributes:nil
+                                                        error:&error];
+        if (error){
+            NSLog(@"createDirectoryAtPath.error-->%@",error);
+        }
+        else{
+            NSLog(@"createDirectoryAtPath.success-->successfully");
+        }
+        
     }
     
-  }
-  
-  NSString * file = [NSString stringWithFormat:@"%@.%@",defaultResourceName,bundleResourceExtension];
-  NSString* filePath   =  [[self localAssetPath] stringByAppendingPathComponent:file];
-  BOOL fileExist = [fm fileExistsAtPath:filePath];
-  if (!fileExist){
-    // file not exist  and next to unzip the decrypt zip to this destination path
-    NSString * zipPath = [[NSBundle mainBundle] pathForResource:defaultBundleZipName ofType:@"zip"];
-    
-    NSString * unzippedFolderPath  = [self localAssetPath];
-    
-    NSError* error= nil;
-    [SSZipArchive unzipFileAtPath:zipPath
-                    toDestination:unzippedFolderPath overwrite:YES password:defaultBundleZipPassword error:&error];
-    if (!error){
-      NSLog(@"create the {%@} in {%@} successfully--->",file,unzippedFolderPath);
-      NSString* retPath = [unzippedFolderPath stringByAppendingPathComponent:file];
-      return [NSURL URLWithString:retPath];
+    NSString * file = [NSString stringWithFormat:@"%@.%@",defaultResourceName,bundleResourceExtension];
+    NSString* filePath   =  [[self localAssetPath] stringByAppendingPathComponent:file];
+    BOOL fileExist = [fm fileExistsAtPath:filePath];
+    if (!fileExist){
+        // file not exist  and next to unzip the decrypt zip to this destination path
+        NSString * zipPath = [[NSBundle mainBundle] pathForResource:defaultBundleZipName ofType:@"zip"];
+        
+        NSString * unzippedFolderPath  = [self localAssetPath];
+        
+        NSError* error= nil;
+        [SSZipArchive unzipFileAtPath:zipPath
+                        toDestination:unzippedFolderPath overwrite:YES password:defaultBundleZipPassword error:&error];
+        if (!error){
+            NSLog(@"create the {%@} in {%@} successfully--->",file,unzippedFolderPath);
+            NSString* retPath = [unzippedFolderPath stringByAppendingPathComponent:file];
+            return [NSURL fileURLWithPath:retPath isDirectory:NO];
+        }
+        return nil;
+        
     }
-    return nil;
     
-  }
-  
-  NSString* retPath = [[self localAssetPath] stringByAppendingPathComponent:file];
-  return [NSURL URLWithString:retPath];
-  
-  
-
-  
-  
-  
+    NSString* retPath = [[self localAssetPath] stringByAppendingPathComponent:file];
+    
+    return [NSURL fileURLWithPath:retPath isDirectory:NO];
+    
+    
+    
+    
+    
+    
 }
 
 
@@ -165,7 +166,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     if (bundleResourceSubdirectory) {
         resourcePath = [resourcePath stringByAppendingPathComponent:bundleResourceSubdirectory];
     }
-
+    
     return [resourcePath stringByAppendingPathComponent:[CodeFlyUpdateUtils assetsFolderName]];
 }
 
@@ -213,31 +214,31 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     bundleResourceExtension = resourceExtension;
     bundleResourceSubdirectory = resourceSubdirectory;
     bundleResourceBundle = resourceBundle;
-
-
+    
+    
     NSString *logMessageFormat = @"Loading JS bundle from %@";
-
+    
     NSError *error;
     NSString *packageFile = [CodeFlyPackage getCurrentPackageBundlePath:&error];
-//    NSURL *binaryBundleURL = [self binaryBundleURL];
-
+    //    NSURL *binaryBundleURL = [self binaryBundleURL];
+    
     if (error || !packageFile) {
-//        CFLog(logMessageFormat, binaryBundleURL);
+        //        CFLog(logMessageFormat, binaryBundleURL);
         isRunningBinaryVersion = YES;
         return nil;
     }
-
+    
     NSString *binaryAppVersion = [[CodeFlyConfig current] appVersion];
     NSDictionary *currentPackageMetadata = [CodeFlyPackage getCurrentPackage:&error];
     if (error || !currentPackageMetadata) {
-//        CFLog(logMessageFormat, binaryBundleURL);
+        //        CFLog(logMessageFormat, binaryBundleURL);
         isRunningBinaryVersion = YES;
         return nil;
     }
-
+    
     NSString *packageDate = [currentPackageMetadata objectForKey:BinaryBundleDateKey];
     NSString *packageAppVersion = [currentPackageMetadata objectForKey:AppVersionKey];
-
+    
     if ([binaryAppVersion isEqualToString:packageAppVersion]) {
         // Return package file because it is newer than the app store binary's JS bundle
         NSURL *packageUrl = [[NSURL alloc] initFileURLWithPath:packageFile];
@@ -249,18 +250,18 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
 #ifndef DEBUG
         isRelease = YES;
 #endif
-
+        
         if (isRelease || ![binaryAppVersion isEqualToString:packageAppVersion]) {
             [CodeFly clearUpdates];
         }
-
-//        CFLog(logMessageFormat, binaryBundleURL);
+        
+        //        CFLog(logMessageFormat, binaryBundleURL);
         isRunningBinaryVersion = YES;
-//        return binaryBundleURL;
-      
-      
-      // update 2021--7 --7 night
-      return  packageFile;
+        //        return binaryBundleURL;
+        
+        
+        // update 2021--7 --7 night
+        return  packageFile;
     }
 }
 
@@ -319,15 +320,15 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     // Export the values of the CodeFlyInstallMode and CodeFlyUpdateState
     // enums so that the script-side can easily stay in sync
     return @{
-             @"CodeFlyInstallModeOnNextRestart":@(CodeFlyInstallModeOnNextRestart),
-             @"CodeFlyInstallModeImmediate": @(CodeFlyInstallModeImmediate),
-             @"CodeFlyInstallModeOnNextResume": @(CodeFlyInstallModeOnNextResume),
-             @"CodeFlyInstallModeOnNextSuspend": @(CodeFlyInstallModeOnNextSuspend),
-
-             @"CodeFlyUpdateStateRunning": @(CodeFlyUpdateStateRunning),
-             @"CodeFlyUpdateStatePending": @(CodeFlyUpdateStatePending),
-             @"CodeFlyUpdateStateLatest": @(CodeFlyUpdateStateLatest)
-            };
+        @"CodeFlyInstallModeOnNextRestart":@(CodeFlyInstallModeOnNextRestart),
+        @"CodeFlyInstallModeImmediate": @(CodeFlyInstallModeImmediate),
+        @"CodeFlyInstallModeOnNextResume": @(CodeFlyInstallModeOnNextResume),
+        @"CodeFlyInstallModeOnNextSuspend": @(CodeFlyInstallModeOnNextSuspend),
+        
+        @"CodeFlyUpdateStateRunning": @(CodeFlyUpdateStateRunning),
+        @"CodeFlyUpdateStatePending": @(CodeFlyUpdateStatePending),
+        @"CodeFlyUpdateStateLatest": @(CodeFlyUpdateStateLatest)
+    };
 };
 
 + (BOOL)requiresMainQueueSetup
@@ -343,14 +344,14 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
 }
 
 - (void)dispatchDownloadProgressEvent {
-  // Notify the script-side about the progress
-  [self sendEventWithName:DownloadProgressEvent
-                     body:@{
-                       @"totalBytes" : [NSNumber
-                           numberWithLongLong:_latestExpectedContentLength],
-                       @"receivedBytes" : [NSNumber
-                           numberWithLongLong:_latestReceivedConentLength]
-                     }];
+    // Notify the script-side about the progress
+    [self sendEventWithName:DownloadProgressEvent
+                       body:@{
+        @"totalBytes" : [NSNumber
+                         numberWithLongLong:_latestExpectedContentLength],
+        @"receivedBytes" : [NSNumber
+                            numberWithLongLong:_latestReceivedConentLength]
+    }];
 }
 
 - (instancetype)init
@@ -360,7 +361,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     
     
     self = [super init];
-
+    
     return self;
 }
 
@@ -390,7 +391,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
                 }
             }
         }
-
+        
         return NO;
     }
 }
@@ -406,7 +407,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
         if (![super.bridge.bundleURL.scheme hasPrefix:@"http"]) {
             [super.bridge setValue:[CodeFly bundleURL] forKey:@"bundleURL"];
         }
-
+        
         [super.bridge reload];
     });
 }
@@ -432,7 +433,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
         // objects, regardless if you stored something mutable.
         failedUpdates = [failedUpdates mutableCopy];
     }
-
+    
     [failedUpdates addObject:failedPackage];
     [preferences setObject:failedUpdates forKey:FailedUpdatesKey];
     [preferences synchronize];
@@ -462,40 +463,40 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
 // a resume-based update still pending installation.
 - (void)applicationDidBecomeActive
 {
-//    if (_installMode == CodeFlyInstallModeOnNextSuspend) {
-//        int durationInBackground = [self getDurationInBackground];
-//        // We shouldn't use loadBundle in this case, because _appSuspendTimer will call loadBundleOnTick.
-//        // We should cancel timer for _appSuspendTimer because otherwise, we would call loadBundle two times.
-//        if (durationInBackground < _minimumBackgroundDuration) {
-//            [_appSuspendTimer invalidate];
-//            _appSuspendTimer = nil;
-//        }
-//    }
+    //    if (_installMode == CodeFlyInstallModeOnNextSuspend) {
+    //        int durationInBackground = [self getDurationInBackground];
+    //        // We shouldn't use loadBundle in this case, because _appSuspendTimer will call loadBundleOnTick.
+    //        // We should cancel timer for _appSuspendTimer because otherwise, we would call loadBundle two times.
+    //        if (durationInBackground < _minimumBackgroundDuration) {
+    //            [_appSuspendTimer invalidate];
+    //            _appSuspendTimer = nil;
+    //        }
+    //    }
 }
 
 - (void)applicationWillEnterForeground
 {
-//    if (_installMode == CodeFlyInstallModeOnNextResume) {
-//        int durationInBackground = [self getDurationInBackground];
-//        if (durationInBackground >= _minimumBackgroundDuration) {
-//            [self restartAppInternal];
-//        }
-//    }
+    //    if (_installMode == CodeFlyInstallModeOnNextResume) {
+    //        int durationInBackground = [self getDurationInBackground];
+    //        if (durationInBackground >= _minimumBackgroundDuration) {
+    //            [self restartAppInternal];
+    //        }
+    //    }
 }
 
 - (void)applicationWillResignActive
 {
     // Save the current time so that when the app is later
     // resumed, we can detect how long it was in the background.
-//    _lastResignedDate = [NSDate date];
-//
-//    if (_installMode == CodeFlyInstallModeOnNextSuspend && [[self class] isPendingUpdate:nil]) {
-//        _appSuspendTimer = [NSTimer scheduledTimerWithTimeInterval:_minimumBackgroundDuration
-//                                                         target:self
-//                                                       selector:@selector(loadBundleOnTick:)
-//                                                       userInfo:nil
-//                                                        repeats:NO];
-//    }
+    //    _lastResignedDate = [NSDate date];
+    //
+    //    if (_installMode == CodeFlyInstallModeOnNextSuspend && [[self class] isPendingUpdate:nil]) {
+    //        _appSuspendTimer = [NSTimer scheduledTimerWithTimeInterval:_minimumBackgroundDuration
+    //                                                         target:self
+    //                                                       selector:@selector(loadBundleOnTick:)
+    //                                                       userInfo:nil
+    //                                                        repeats:NO];
+    //    }
 }
 
 -(void)loadBundleOnTick:(NSTimer *)timer {
@@ -509,73 +510,73 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
  */
 RCT_EXPORT_METHOD(downloadUpdate:(NSDictionary*)updatePackage
                   notifyProgress:(BOOL)notifyProgress
-                        resolver:(RCTPromiseResolveBlock)resolve
-                        rejecter:(RCTPromiseRejectBlock)reject)
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSDictionary *mutableUpdatePackage = [updatePackage mutableCopy];
     NSURL *binaryBundleURL = [CodeFly binaryBundleURL];
-  
-  
+    
+    
     if (binaryBundleURL != nil) {
         [mutableUpdatePackage setValue:[CodeFlyUpdateUtils modifiedDateStringOfFileAtURL:binaryBundleURL]
                                 forKey:BinaryBundleDateKey];
     }
-
+    
     if (notifyProgress) {
         // Set up and unpause the frame observer so that it can emit
         // progress events every frame if the progress is updated.
         _didUpdateProgress = NO;
         self.paused = NO;
     }
-
+    
     NSString * publicKey = [[CodeFlyConfig current] publicKey];
-
+    
     [CodeFlyPackage
-        downloadPackage:mutableUpdatePackage
-        expectedBundleFileName:[bundleResourceName stringByAppendingPathExtension:bundleResourceExtension]
-        publicKey:publicKey
-        operationQueue:_methodQueue
-        // The download is progressing forward
-        progressCallback:^(long long expectedContentLength, long long receivedContentLength) {
-            // Update the download progress so that the frame observer can notify the JS side
-            _latestExpectedContentLength = expectedContentLength;
-            _latestReceivedConentLength = receivedContentLength;
-            _didUpdateProgress = YES;
-
-            // If the download is completed, stop observing frame
-            // updates and synchronously send the last event.
-            if (expectedContentLength == receivedContentLength) {
-                _didUpdateProgress = NO;
-                self.paused = YES;
-                [self dispatchDownloadProgressEvent];
-            }
-        }
-        // The download completed
-        doneCallback:^{
-            NSError *err;
-            NSDictionary *newPackage = [CodeFlyPackage getPackage:mutableUpdatePackage[PackageHashKey] error:&err];
-
-            if (err) {
-                return reject([NSString stringWithFormat: @"%lu", (long)err.code], err.localizedDescription, err);
-            }
-            resolve(newPackage);
-        }
-        // The download failed
-        failCallback:^(NSError *err) {
-            if ([CodeFlyErrorUtils isCodeFlyError:err]) {
-                [self saveFailedUpdate:mutableUpdatePackage];
-            }
-
-            // Stop observing frame updates if the download fails.
+     downloadPackage:mutableUpdatePackage
+     expectedBundleFileName:[bundleResourceName stringByAppendingPathExtension:bundleResourceExtension]
+     publicKey:publicKey
+     operationQueue:_methodQueue
+     // The download is progressing forward
+     progressCallback:^(long long expectedContentLength, long long receivedContentLength) {
+        // Update the download progress so that the frame observer can notify the JS side
+        _latestExpectedContentLength = expectedContentLength;
+        _latestReceivedConentLength = receivedContentLength;
+        _didUpdateProgress = YES;
+        
+        // If the download is completed, stop observing frame
+        // updates and synchronously send the last event.
+        if (expectedContentLength == receivedContentLength) {
             _didUpdateProgress = NO;
             self.paused = YES;
-            reject([NSString stringWithFormat: @"%lu", (long)err.code], err.localizedDescription, err);
-        }];
+            [self dispatchDownloadProgressEvent];
+        }
+    }
+     // The download completed
+     doneCallback:^{
+        NSError *err;
+        NSDictionary *newPackage = [CodeFlyPackage getPackage:mutableUpdatePackage[PackageHashKey] error:&err];
+        
+        if (err) {
+            return reject([NSString stringWithFormat: @"%lu", (long)err.code], err.localizedDescription, err);
+        }
+        resolve(newPackage);
+    }
+     // The download failed
+     failCallback:^(NSError *err) {
+        if ([CodeFlyErrorUtils isCodeFlyError:err]) {
+            [self saveFailedUpdate:mutableUpdatePackage];
+        }
+        
+        // Stop observing frame updates if the download fails.
+        _didUpdateProgress = NO;
+        self.paused = YES;
+        reject([NSString stringWithFormat: @"%lu", (long)err.code], err.localizedDescription, err);
+    }];
 }
 
 - (void)restartAppInternal
 {
-
+    
     [self loadBundle];
     CFLog(@"Restarting app.");
 }
@@ -587,7 +588,7 @@ RCT_EXPORT_METHOD(downloadUpdate:(NSDictionary*)updatePackage
  * app version, as well as the deployment key that was configured in the Info.plist file.
  */
 RCT_EXPORT_METHOD(getConfiguration:(RCTPromiseResolveBlock)resolve
-                          rejecter:(RCTPromiseRejectBlock)reject)
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSDictionary *configuration = [[CodeFlyConfig current] configuration];
     resolve(configuration);
@@ -597,11 +598,11 @@ RCT_EXPORT_METHOD(getConfiguration:(RCTPromiseResolveBlock)resolve
  * This method is the native side of the CodeFly.getUpdateMetadata method.
  */
 RCT_EXPORT_METHOD(getUpdateMetadata:(RCTPromiseResolveBlock)resolve
-                           rejecter:(RCTPromiseRejectBlock)reject)
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSError *error;
     NSMutableDictionary *package = [[CodeFlyPackage getCurrentPackage:&error] mutableCopy];
-
+    
     if (error) {
         return reject([NSString stringWithFormat: @"%lu", (long)error.code], error.localizedDescription, error);
     } else if (package == nil) {
@@ -610,30 +611,30 @@ RCT_EXPORT_METHOD(getUpdateMetadata:(RCTPromiseResolveBlock)resolve
         // wanted to retrieve the pending or running update.
         return resolve(nil);
     }
-
-  
+    
+    
     resolve(package);
-
+    
 }
 
 /*
  * This method is the native side of the LocalPackage.install method.
  */
 RCT_EXPORT_METHOD(installUpdate:(NSDictionary*)updatePackage
-                    installMode:(CodeFlyInstallMode)installMode
-      minimumBackgroundDuration:(int)minimumBackgroundDuration
-                       resolver:(RCTPromiseResolveBlock)resolve
-                       rejecter:(RCTPromiseRejectBlock)reject)
+                  installMode:(CodeFlyInstallMode)installMode
+                  minimumBackgroundDuration:(int)minimumBackgroundDuration
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSError *error;
     [CodeFlyPackage installPackage:updatePackage
-                removePendingUpdate:YES
-                              error:&error];
-
+               removePendingUpdate:YES
+                             error:&error];
+    
     if (error) {
         reject([NSString stringWithFormat: @"%lu", (long)error.code], error.localizedDescription, error);
     } else {
-  
+        
         if (!_hasResumeListener) {
             // Ensure we do not add the listener twice.
             // Register for app resume notifications so that we
@@ -642,20 +643,20 @@ RCT_EXPORT_METHOD(installUpdate:(NSDictionary*)updatePackage
                                                      selector:@selector(applicationDidBecomeActive)
                                                          name:UIApplicationDidBecomeActiveNotification
                                                        object:RCTSharedApplication()];
-                                                       
+            
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(applicationWillEnterForeground)
                                                          name:UIApplicationWillEnterForegroundNotification
                                                        object:RCTSharedApplication()];
-
+            
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(applicationWillResignActive)
                                                          name:UIApplicationWillResignActiveNotification
                                                        object:RCTSharedApplication()];
-
+            
             _hasResumeListener = YES;
         }
-
+        
         // Signal to JS that the update has been applied.
         resolve(nil);
     }
@@ -666,8 +667,8 @@ RCT_EXPORT_METHOD(installUpdate:(NSDictionary*)updatePackage
  * This method is the native side of the CodeFly.restartApp() method.
  */
 RCT_EXPORT_METHOD(restartApp:(BOOL)onlyIfUpdateIsPending
-                     resolve:(RCTPromiseResolveBlock)resolve
-                    rejecter:(RCTPromiseRejectBlock)reject)
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     [self restartAppInternal];
     resolve(nil);
@@ -695,7 +696,7 @@ RCT_EXPORT_METHOD(clearUpdates) {
     if (!_didUpdateProgress) {
         return;
     }
-
+    
     [self dispatchDownloadProgressEvent];
     _didUpdateProgress = NO;
 }
