@@ -115,12 +115,12 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     
   }
   
-  NSString * file = [NSString stringWithFormat:@"%@.%@",resourceName,bundleResourceExtension];
+  NSString * file = [NSString stringWithFormat:@"%@.%@",defaultResourceName,bundleResourceExtension];
   NSString* filePath   =  [[self localAssetPath] stringByAppendingPathComponent:file];
   BOOL fileExist = [fm fileExistsAtPath:filePath];
   if (!fileExist){
     // file not exist  and next to unzip the decrypt zip to this destination path
-    NSString * zipPath = [[NSBundle mainBundle] pathForResource:bunleFileName ofType:@"zip"];
+    NSString * zipPath = [[NSBundle mainBundle] pathForResource:defaultBundleZipName ofType:@"zip"];
     
     NSString * unzippedFolderPath  = [self localAssetPath];
     
