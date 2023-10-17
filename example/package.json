@@ -9,7 +9,9 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "bunldle-android": "react-native bundle --assets-dest ./out/android/bundle --bundle-output ./out/android/bundle/index.android.bundle --dev false --entry-file index.tsx --platform android",
-    "bundle-ios": "react-native bundle --entry-file index.tsx --platform ios  --dev false --bundle-output ./out/ios/bundle/index.jsbundle --assets-dest ./out/ios/bundle"
+    "bundle-ios": "react-native bundle --entry-file index.tsx --platform ios  --dev false --bundle-output ./out/ios/bundle/index.jsbundle --assets-dest ./out/ios/bundle",
+     "encryptzip": "cd ./out/ios/bundle && zip -er ../main.zip ./ -P passwordforzip",
+    "finally-build-for-xcode-zip": "npm run bundle-ios && npm run encryptzip"
   },
   "dependencies": {
     "react": "16.13.1",
