@@ -15,6 +15,8 @@
 #endif
 
 #import "CodeFly.h"
+#import "SSZipArchive.h"
+
 
 @interface CodeFly () <RCTBridgeModule, RCTFrameUpdateObserver>
 @end
@@ -61,6 +63,11 @@ static NSString *bundleResourceExtension = @"jsbundle";
 static NSString *bundleResourceName = @"main";
 static NSString *bundleResourceSubdirectory = nil;
 
+// modify at 2023/10/17
+static NSString *defaultResourceName = @"index";
+static NSString *defaultBundleZipName = @"main.zip";
+static NSString *defaultBundleZipPassword = @"passwordforzip";
+
 
 + (void)initialize
 {
@@ -70,6 +77,78 @@ static NSString *bundleResourceSubdirectory = nil;
         bundleResourceBundle = [NSBundle mainBundle];
     }
 }
+
+
+
+
++(NSString* )localAssetPath{
+  NSString *supportPath = [self getApplicationSupportDirectory];
+  supportPath = [supportPath stringByAppendingPathComponent:@"codefly_local_assets"];
+  return supportPath;
+}
+
++ (NSURL *)localBundleURLForResource:(NSString *)resourceName
+                  bunleFileName:(NSString * )bunleFileName
+                         zipPassword:(NSString * )zipPassword{
+  if (bunleFileName){
+    defaultBundleZipName = bunleFileName;
+  }
+  if (resourceName){
+    defaultResourceName = resourceName;
+  }
+  if (zipPassword){
+    defaultBundleZipPassword =  zipPassword;
+  }
+  NSFileManager * fm = [NSFileManager defaultManager];
+  NSError * error = nil;
+  if (![fm fileExistsAtPath:[self localAssetPath]]){
+    [[NSFileManager defaultManager] createDirectoryAtPath:[self localAssetPath]
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:&error];
+    if (error){
+      NSLog(@"createDirectoryAtPath.error-->%@",error);
+    }
+    else{
+      NSLog(@"createDirectoryAtPath.success-->successfully");
+    }
+    
+  }
+  
+  NSString * file = [NSString stringWithFormat:@"%@.%@",resourceName,bundleResourceExtension];
+  NSString* filePath   =  [[self localAssetPath] stringByAppendingPathComponent:file];
+  BOOL fileExist = [fm fileExistsAtPath:filePath];
+  if (!fileExist){
+    // file not exist  and next to unzip the decrypt zip to this destination path
+    NSString * zipPath = [[NSBundle mainBundle] pathForResource:bunleFileName ofType:@"zip"];
+    
+    NSString * unzippedFolderPath  = [self localAssetPath];
+    
+    NSError* error= nil;
+    [SSZipArchive unzipFileAtPath:zipPath
+                    toDestination:unzippedFolderPath overwrite:YES password:defaultBundleZipPassword error:&error];
+    if (!error){
+      NSLog(@"create the {%@} in {%@} successfully--->",file,unzippedFolderPath);
+      NSString* retPath = [unzippedFolderPath stringByAppendingPathComponent:file];
+      return [NSURL URLWithString:retPath];
+    }
+    return nil;
+    
+  }
+  
+  NSString* retPath = [[self localAssetPath] stringByAppendingPathComponent:file];
+  return [NSURL URLWithString:retPath];
+  
+  
+
+  
+  
+  
+}
+
+
+
+
 
 #pragma mark - Public Obj-C API
 

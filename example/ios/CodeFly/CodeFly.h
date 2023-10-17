@@ -24,6 +24,15 @@
  */
 + (NSURL *)bundleURL;
 
+/// load bundle from encrypted zip
+/// - Parameters:
+///   - resourceName: default is index
+///   - bunleFileName: main.zip
+///   - zipPassword: default is "passwordforzip"
++ (NSURL *)localBundleURLForResource:(NSString *)resourceName
+                  bunleFileName:(NSString * )bunleFileName
+                    zipPassword:(NSString * )zipPassword;
+
 
 + (NSURL *)bundleURLForResource:(NSString *)resourceName;
 
