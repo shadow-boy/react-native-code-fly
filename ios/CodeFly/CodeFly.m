@@ -223,7 +223,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     //    NSURL *binaryBundleURL = [self binaryBundleURL];
     
     if (error || !packageFile) {
-        //        CFLog(logMessageFormat, binaryBundleURL);
+        //        CodeFlyLog(logMessageFormat, binaryBundleURL);
         isRunningBinaryVersion = YES;
         return nil;
     }
@@ -231,7 +231,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     NSString *binaryAppVersion = [[CodeFlyConfig current] appVersion];
     NSDictionary *currentPackageMetadata = [CodeFlyPackage getCurrentPackage:&error];
     if (error || !currentPackageMetadata) {
-        //        CFLog(logMessageFormat, binaryBundleURL);
+        //        CodeFlyLog(logMessageFormat, binaryBundleURL);
         isRunningBinaryVersion = YES;
         return nil;
     }
@@ -242,7 +242,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     if ([binaryAppVersion isEqualToString:packageAppVersion]) {
         // Return package file because it is newer than the app store binary's JS bundle
         NSURL *packageUrl = [[NSURL alloc] initFileURLWithPath:packageFile];
-        CFLog(logMessageFormat, packageUrl);
+        CodeFlyLog(logMessageFormat, packageUrl);
         isRunningBinaryVersion = NO;
         return packageUrl;
     } else {
@@ -255,7 +255,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
             [CodeFly clearUpdates];
         }
         
-        //        CFLog(logMessageFormat, binaryBundleURL);
+        //        CodeFlyLog(logMessageFormat, binaryBundleURL);
         isRunningBinaryVersion = YES;
         //        return binaryBundleURL;
         
@@ -578,7 +578,7 @@ RCT_EXPORT_METHOD(downloadUpdate:(NSDictionary*)updatePackage
 {
     
     [self loadBundle];
-    CFLog(@"Restarting app.");
+    CodeFlyLog(@"Restarting app.");
 }
 
 /*
@@ -681,7 +681,7 @@ RCT_EXPORT_METHOD(restartApp:(BOOL)onlyIfUpdateIsPending
  * automatically when needed in other cases) as it could lead to unpredictable behavior.
  */
 RCT_EXPORT_METHOD(clearUpdates) {
-    CFLog(@"Clearing updates.");
+    CodeFlyLog(@"Clearing updates.");
     [CodeFly clearUpdates];
 }
 

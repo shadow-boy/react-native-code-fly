@@ -189,7 +189,7 @@ failCallback:(void (^)(NSError *err))failCallback;
 
 @end
 
-void CFLog(NSString *formatString, ...);
+void CodeFlyLog(NSString *formatString, ...);
 
 typedef NS_ENUM(NSInteger, CodeFlyInstallMode) {
     CodeFlyInstallModeImmediate,

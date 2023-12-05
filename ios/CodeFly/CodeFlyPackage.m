@@ -29,7 +29,7 @@ static NSString *const UnzippedFolderName = @"unzipped";
                                                            error:&error];
   
   if (error) {
-    CFLog(@"Error downloading from URL %@", remoteBundleUrl);
+    CodeFlyLog(@"Error downloading from URL %@", remoteBundleUrl);
   } else {
     NSString *currentPackageBundlePath = [self getCurrentPackageBundlePath:&error];
     [downloadedBundle writeToFile:currentPackageBundlePath
@@ -102,7 +102,7 @@ static NSString *const UnzippedFolderName = @"unzipped";
       [[NSFileManager defaultManager] removeItemAtPath:downloadFilePath
                                                  error:&nonFailingError];
       if (nonFailingError) {
-        CFLog(@"Error deleting downloaded file: %@", nonFailingError);
+        CodeFlyLog(@"Error deleting downloaded file: %@", nonFailingError);
         nonFailingError = nil;
       }
       
@@ -118,7 +118,7 @@ static NSString *const UnzippedFolderName = @"unzipped";
       [[NSFileManager defaultManager] removeItemAtPath:unzippedFolderPath
                                                  error:&nonFailingError];
       if (nonFailingError) {
-        CFLog(@"Error deleting downloaded file: %@", nonFailingError);
+        CodeFlyLog(@"Error deleting downloaded file: %@", nonFailingError);
         nonFailingError = nil;
       }
       
@@ -386,7 +386,7 @@ static NSString *const UnzippedFolderName = @"unzipped";
       [[NSFileManager defaultManager] removeItemAtPath:currentPackageFolderPath
                                                  error:&deleteError];
       if (deleteError) {
-        CFLog(@"Error deleting pending package: %@", deleteError);
+        CodeFlyLog(@"Error deleting pending package: %@", deleteError);
       }
     }
   } else {
@@ -398,7 +398,7 @@ static NSString *const UnzippedFolderName = @"unzipped";
       [[NSFileManager defaultManager] removeItemAtPath:previousPackageFolderPath
                                                  error:&deleteError];
       if (deleteError) {
-        CFLog(@"Error deleting old package: %@", deleteError);
+        CodeFlyLog(@"Error deleting old package: %@", deleteError);
       }
     }
     [info setValue:info[@"currentPackage"] forKey:@"previousPackage"];
@@ -414,13 +414,13 @@ static NSString *const UnzippedFolderName = @"unzipped";
   NSError *error;
   NSMutableDictionary *info = [self getCurrentPackageInfo:&error];
   if (!info) {
-    CFLog(@"Error getting current package info: %@", error);
+    CodeFlyLog(@"Error getting current package info: %@", error);
     return;
   }
   
   NSString *currentPackageFolderPath = [self getCurrentPackageFolderPath:&error];
   if (!currentPackageFolderPath) {
-    CFLog(@"Error getting current package folder path: %@", error);
+    CodeFlyLog(@"Error getting current package folder path: %@", error);
     return;
   }
   
@@ -428,7 +428,7 @@ static NSString *const UnzippedFolderName = @"unzipped";
   BOOL result = [[NSFileManager defaultManager] removeItemAtPath:currentPackageFolderPath
                                                            error:&deleteError];
   if (!result) {
-    CFLog(@"Error deleting current package contents at %@ error %@", currentPackageFolderPath, deleteError);
+    CodeFlyLog(@"Error deleting current package contents at %@ error %@", currentPackageFolderPath, deleteError);
   }
   
   [info setValue:info[@"previousPackage"] forKey:@"currentPackage"];

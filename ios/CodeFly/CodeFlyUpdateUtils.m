@@ -262,7 +262,7 @@ NSString * const IgnoreCodeFlyMetadata = @".CodeFlyrelease";
                    expectedHash:(NSString *)expectedHash
                           error:(NSError **)error
 {
-    CFLog(@"Verifying hash for folder path: %@", finalUpdateFolder);
+    CodeFlyLog(@"Verifying hash for folder path: %@", finalUpdateFolder);
     
     NSMutableArray *updateContentsManifest = [NSMutableArray array];
     BOOL result = [self addContentsOfFolderToManifest:finalUpdateFolder
@@ -270,7 +270,7 @@ NSString * const IgnoreCodeFlyMetadata = @".CodeFlyrelease";
                                              manifest:updateContentsManifest
                                                 error:error];
     
-    CFLog(@"Manifest string: %@", updateContentsManifest);
+    CodeFlyLog(@"Manifest string: %@", updateContentsManifest);
     
     if (!result) {
         return NO;
@@ -282,7 +282,7 @@ NSString * const IgnoreCodeFlyMetadata = @".CodeFlyrelease";
         return NO;
     }
     
-    CFLog(@"Expected hash: %@, actual hash: %@", expectedHash, updateContentsManifestHash);
+    CodeFlyLog(@"Expected hash: %@, actual hash: %@", expectedHash, updateContentsManifestHash);
     
     return [updateContentsManifestHash isEqualToString:expectedHash];
 }
@@ -331,7 +331,7 @@ NSString * const IgnoreCodeFlyMetadata = @".CodeFlyrelease";
     NSString *signature = [self getSignatureFor: folderPath
                                           error: &signatureVerificationError];
     if (signatureVerificationError) {
-        CFLog(@"The update could not be verified because no signature was found. %@", signatureVerificationError);
+        CodeFlyLog(@"The update could not be verified because no signature was found. %@", signatureVerificationError);
         *error = signatureVerificationError;
         return false;
     }
@@ -339,15 +339,15 @@ NSString * const IgnoreCodeFlyMetadata = @".CodeFlyrelease";
     NSError *payloadDecodingError;
     NSDictionary *envelopedPayload = [self verifyAndDecodeJWT:signature withPublicKey:publicKey error:&payloadDecodingError];
     if(payloadDecodingError){
-        CFLog(@"The update could not be verified because it was not signed by a trusted party. %@", payloadDecodingError);
+        CodeFlyLog(@"The update could not be verified because it was not signed by a trusted party. %@", payloadDecodingError);
         *error = payloadDecodingError;
         return false;
     }
     
-    CFLog(@"JWT signature verification succeeded, payload content:  %@", envelopedPayload);
+    CodeFlyLog(@"JWT signature verification succeeded, payload content:  %@", envelopedPayload);
     
     if(![envelopedPayload objectForKey:@"contentHash"]){
-        CFLog(@"The update could not be verified because the signature did not specify a content hash.");
+        CodeFlyLog(@"The update could not be verified because the signature did not specify a content hash.");
         return false;
     }
     
