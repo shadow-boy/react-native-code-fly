@@ -82,8 +82,9 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
 
 
 +(NSString* )localAssetPath{
+    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *supportPath = [self getApplicationSupportDirectory];
-    supportPath = [supportPath stringByAppendingPathComponent:@"codefly_local_assets"];
+    supportPath = [supportPath stringByAppendingPathComponent:[NSString stringWithFormat:@"codefly_local_assets_%@",version]];
     return supportPath;
 }
 
