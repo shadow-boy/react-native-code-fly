@@ -78,13 +78,18 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     }
 }
 
++(NSString* )localAssetPathWithVersion{
+    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *supportPath = [self getApplicationSupportDirectory];
+    supportPath = [supportPath stringByAppendingPathComponent:[NSString stringWithFormat:@"codefly_local_assets_%@",version]];
+    return supportPath;
+}
 
 
 
 +(NSString* )localAssetPath{
-    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *supportPath = [self getApplicationSupportDirectory];
-    supportPath = [supportPath stringByAppendingPathComponent:[NSString stringWithFormat:@"codefly_local_assets_%@",version]];
+    supportPath = [supportPath stringByAppendingPathComponent:@"codefly_local_assets"];
     return supportPath;
 }
 
@@ -102,8 +107,8 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
     }
     NSFileManager * fm = [NSFileManager defaultManager];
     NSError * error = nil;
-    if (![fm fileExistsAtPath:[self localAssetPath]]){
-        [[NSFileManager defaultManager] createDirectoryAtPath:[self localAssetPath]
+    if (![fm fileExistsAtPath:[self localAssetPathWithVersion]]){
+        [[NSFileManager defaultManager] createDirectoryAtPath:[self localAssetPathWithVersion]
                                   withIntermediateDirectories:YES
                                                    attributes:nil
                                                         error:&error];
@@ -123,7 +128,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
         // file not exist  and next to unzip the decrypt zip to this destination path
         NSString * zipPath = [[NSBundle mainBundle] pathForResource:defaultBundleZipName ofType:@"zip"];
         
-        NSString * unzippedFolderPath  = [self localAssetPath];
+        NSString * unzippedFolderPath  = [self localAssetPathWithVersion];
         
         NSError* error= nil;
         [SSZipArchive unzipFileAtPath:zipPath
@@ -137,7 +142,7 @@ static NSString *defaultBundleZipPassword = @"passwordforzip";
         
     }
     
-    NSString* retPath = [[self localAssetPath] stringByAppendingPathComponent:file];
+    NSString* retPath = [[self localAssetPathWithVersion] stringByAppendingPathComponent:file];
     
     return [NSURL fileURLWithPath:retPath isDirectory:NO];
     
