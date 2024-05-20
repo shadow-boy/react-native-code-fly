@@ -108,18 +108,24 @@ declare namespace CodeFly {
     /**
      * Asks the CodeFly service whether the configured app deployment has an update available.
      *
-     * @param deploymentKey The deployment key to use to query the CodeFly server for an update.
+     * @param config The deployment key to use to query the CodeFly server for an update. 不传，默认从原生工程里面读取
      * 
-     * @param handleBinaryVersionMismatchCallback An optional callback for handling target binary version mismatch
      */
-    function checkForUpdate(deploymentKey?: string, handleBinaryVersionMismatchCallback?: HandleBinaryVersionMismatchCallback): Promise<RemotePackage | null>;
+    function checkForUpdate(
+        config?:
+            {
+                deploymentKey?: string
+                serverUrl?: string,
+                encryptResponse?: boolean
+            }
+    ): Promise<RemotePackage | null>;
 
     /**
      * Retrieves the metadata for an installed update (e.g. description, mandatory).
      *
      * @param updateState The state of the update you want to retrieve the metadata for. Defaults to UpdateState.RUNNING.
      */
-    function getUpdateMetadata(updateState?: UpdateState) : Promise<LocalPackage|null>;
+    function getUpdateMetadata(updateState?: UpdateState): Promise<LocalPackage | null>;
 
 
     /**
@@ -167,7 +173,7 @@ declare namespace CodeFly {
         ON_NEXT_SUSPEND
     }
 
-    
+
 
     /**
      * Indicates the state that an update is currently in.

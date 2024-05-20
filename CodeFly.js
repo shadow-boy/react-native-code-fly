@@ -3,15 +3,16 @@ import { NativeEventEmitter } from "react-native";
 let NativeCodeFly = require("react-native").NativeModules.CodeFly;
 
 
+
 export default class CodeFly {
 
   /**
    * 检查更新
    * @param {*} deploymentKey 
-   * @param {*} handleBinaryVersionMismatchCallback 
    * @returns 
    */
-  static async checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchCallback = null) {
+  static async checkForUpdate(config = {}) {
+    let { deploymentKey = null, serverUrl = "https://www.rnhotfix.xyz", encryptResponse = false } = config
 
     //native config
     const config = await getConfiguration()
@@ -19,18 +20,21 @@ export default class CodeFly {
 
     const headers = {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Encrypt": encryptResponse ? "1" : "0"
     };
     let action = "/codefly/update_check"
 
-    let baseurl = config.serverUrl
+    if (!serverUrl) {
+      serverUrl = config.serverUrl
+    }
 
     if (!deploymentKey) {
       deploymentKey = config.deploymentKey
     }
 
     let requestBody = { "deployment_key": deploymentKey, "app_version": config.appVersion, "client_unique_id": config.clientUniqueId }
-    const response = await fetch(baseurl + action, {
+    const response = await fetch(serverUrl + action, {
       method: "POST",
       headers: headers,
       body: JSON.stringify(requestBody)
