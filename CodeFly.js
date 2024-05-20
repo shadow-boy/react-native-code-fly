@@ -11,8 +11,8 @@ export default class CodeFly {
    * @param {*} deploymentKey 
    * @returns 
    */
-  static async checkForUpdate(config = {}) {
-    let { deploymentKey = null, serverUrl = "https://www.rnhotfix.xyz", encryptResponse = false } = config
+  static async checkForUpdate(checkConfig = {}) {
+    let { deploymentKey = null, serverUrl = "https://www.rnhotfix.xyz", encryptResponse = false } = checkConfig
 
     //native config
     const config = await getConfiguration()

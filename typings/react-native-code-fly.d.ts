@@ -112,7 +112,7 @@ declare namespace CodeFly {
      * 
      */
     function checkForUpdate(
-        config?:
+        checkConfig?:
             {
                 deploymentKey?: string
                 serverUrl?: string,
